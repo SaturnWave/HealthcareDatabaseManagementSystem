@@ -1,0 +1,69 @@
+
+
+--1. 
+select cast(ceil( months_between(enddate,startdate)) AS INT) AS "Months" from prescription;
+
+
+--cast: converts the result to integer data type
+--ceil: rounds up to the nearest whole number
+
+--2.
+
+SELECT CONCAT(CONCAT(CONCAT(CONCAT(firstname,' '),lastname), ' specializes in '), specialization) AS concatenatedstring FROM doctor;
+
+
+--concat(firstname,lastname) : concatenates the firstname and lastname together
+--CONCAT(CONCAT(FIRSTNAME, LASTNAME), ' specializes in ') : concatenates the firstname,lastname and specailizes in
+-- last concat concatenates all of it to specailization
+
+
+
+--4. Operators
+
+ select * from medication where drugname = 'Lisinopril' AND price=9.99;
+
+-- retrives columns where prescription = lisinopril and diagnosis = hypertension
+
+ select * from billing where amount<200 and amountcoveredbyinsurance= 0 and status = 'Pending';
+
+-- retreives columns in billing where amount is less than 200 and insurance is not cover
+
+--5. Joining
+
+SELECT 
+    p.PatientID,
+    p.FirstName || ' ' || p.LastName AS PatientName,
+    d.FirstName || ' ' || d.LastName AS DoctorName,
+    mr.Symptoms,
+    mr.Diagnosis,
+    mr.Treatment
+FROM Patient p
+JOIN (
+    SELECT 
+        PatientID,
+        MAX(DateOfRecord) AS LatestRecordDate
+    FROM MedicalRecord
+    GROUP BY PatientID
+) latest_mr ON p.PatientID = latest_mr.PatientID
+JOIN MedicalRecord mr ON p.PatientID = mr.PatientID AND latest_mr.LatestRecordDate = mr.DateOfRecord
+JOIN Doctor d ON mr.DoctorID = d.DoctorID;
+
+--5. b
+
+SELECT p.FirstName || ' ' || p.LastName AS PatientName, SUM(mr.TreatmentCost) AS TotalCost 
+
+FROM Patient p 
+
+JOIN MedicalRecord mr ON p.PatientID = mr.PatientID 
+
+GROUP BY p.FirstName, p.LastName; 
+
+--5.c
+
+SELECT p.FirstName || ' ' || p.LastName AS PatientName 
+
+FROM Patient p 
+
+LEFT JOIN MedicalRecord mr ON p.PatientID = mr.PatientID 
+
+WHERE mr.RecordID IS NULL; 

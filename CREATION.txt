@@ -1,0 +1,165 @@
+--Department
+
+
+CREATE TABLE Department (
+    DepartmentID NUMBER(10) PRIMARY KEY,
+    Name VARCHAR2(50),
+    Location VARCHAR2(50),
+    Type VARCHAR2(50),
+    CostCenterCode VARCHAR2(50),
+    Virtual CHAR(1) CHECK (Virtual IN ('Y', 'N'))
+);
+
+
+--Insurance
+
+CREATE TABLE Insurance (
+    InsuranceID NUMBER(10) PRIMARY KEY,
+    Provider VARCHAR2(50),
+    PolicyNumber VARCHAR2(50),
+    PolicyType VARCHAR2(50),
+    CoverageStartDate DATE,
+    CoverageEndDate DATE,
+    Premium NUMBER(10,2),
+    Deductible NUMBER(10,2),
+    CoPayment NUMBER(10,2)
+);
+
+--Medication
+
+CREATE TABLE Medication (
+    MedicationID NUMBER(10) PRIMARY KEY,
+    DrugName VARCHAR2(100) NOT NULL,
+    Barcode VARCHAR2(50) UNIQUE NOT NULL,
+    Manufacturer VARCHAR2(100),
+    DateManufactured DATE,
+    ExpiryDate DATE,
+    Description CLOB,
+    DosageInstructions VARCHAR2(200),
+    SideEffects CLOB,
+    Price NUMBER(10, 2),
+    PrescriptionRequired CHAR(1) CHECK (PrescriptionRequired IN ('Y', 'N'))
+);
+
+--Nurse
+
+CREATE TABLE Nurse (
+    NurseID NUMBER(10) PRIMARY KEY,
+    FirstName VARCHAR2(50),
+    LastName VARCHAR2(50),
+    Gender CHAR(1),
+    ContactNumber VARCHAR2(15),
+    Email VARCHAR2(50),
+    Qualification VARCHAR2(50),
+    LicenseNumber VARCHAR2(50),
+    YearsOfExperience NUMBER(3),
+    DepartmentID NUMBER(10),
+    Shift VARCHAR2(20),
+    FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID)
+);
+
+--Doctor
+
+CREATE TABLE Doctor (
+    DoctorID NUMBER(10) PRIMARY KEY,
+    FirstName VARCHAR2(50),
+    LastName VARCHAR2(50),
+    Gender CHAR(1),
+    ContactNumber VARCHAR2(15),
+    Email VARCHAR2(50) NOT NULL,
+    Specialization VARCHAR2(50),
+    LicenseNumber VARCHAR2(50),
+    YearsOfExperience NUMBER(3),
+    DepartmentID NUMBER(10),
+    FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID)
+);
+
+--Patient
+
+CREATE TABLE Patient (
+    PatientID NUMBER(10) PRIMARY KEY,
+    FirstName VARCHAR2(50),
+    LastName VARCHAR2(50),
+    DOB DATE,
+    Gender CHAR(1),
+    ContactNumber VARCHAR2(15),
+    Email VARCHAR2(50),
+    Address VARCHAR2(100),
+    EmergencyContactName VARCHAR2(50),
+    EmergencyContactNumber VARCHAR2(15),
+    PrimaryCarePhysician VARCHAR2(50),
+    MedicalHistory CLOB,
+    InsuranceID NUMBER(10),
+    FOREIGN KEY (InsuranceID) REFERENCES Insurance(InsuranceID)
+);
+
+--Medical Record
+
+CREATE TABLE MedicalRecord (
+    RecordID NUMBER(10) PRIMARY KEY,
+    PatientID NUMBER(10),
+    DoctorID NUMBER(10),
+    Symptoms VARCHAR2(100),
+    Diagnosis VARCHAR2(100),
+    Treatment VARCHAR2(100),
+    PrescriptionID NUMBER(10),
+    TreatmentCost NUMBER(10, 2),
+    DateOfRecord DATE,
+    FollowUpDate DATE,
+    Notes CLOB,
+    FOREIGN KEY (PatientID) REFERENCES Patient(PatientID),
+    FOREIGN KEY (DoctorID) REFERENCES Doctor(DoctorID)
+);
+
+--Prescription
+
+CREATE TABLE Prescription (
+    PrescriptionID NUMBER(10) PRIMARY KEY,
+    RecordID NUMBER(10),
+    MedicationID NUMBER(10),
+    Dosage VARCHAR2(50),
+    Frequency VARCHAR2(50),
+    StartDate DATE,
+    EndDate DATE,
+    Refills NUMBER(3),
+    Pharmacy VARCHAR2(50),
+    Price NUMBER(10, 2),
+    FOREIGN KEY (RecordID) REFERENCES MedicalRecord(RecordID),
+    FOREIGN KEY (MedicationID) REFERENCES Medication(MedicationID)
+);
+
+--Billing
+
+CREATE TABLE Billing (
+    BillID NUMBER(10) PRIMARY KEY,
+    PatientID NUMBER(10),
+    Amount NUMBER(10, 2),
+    DateOfBilling DATE,
+    PaymentMethod VARCHAR2(50),
+    PaymentDate DATE,
+    InsuranceID NUMBER(10),
+    AmountCoveredByInsurance NUMBER(10, 2),
+    Status VARCHAR2(10),
+    FOREIGN KEY (PatientID) REFERENCES Patient(PatientID),
+    FOREIGN KEY (InsuranceID) REFERENCES Insurance(InsuranceID)
+);
+
+--Appointment
+
+CREATE TABLE Appointments (
+    AppointmentID NUMBER(10) PRIMARY KEY,
+    PatientID NUMBER(10),
+    DoctorID NUMBER(10),
+    NurseID NUMBER(10) NULL, -- Optional: In case a nurse is also assigned for the appointment
+    DepartmentID NUMBER(10),
+    AppointmentDate DATE
+);
+
+
+
+
+
+
+
+
+
